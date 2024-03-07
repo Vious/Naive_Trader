@@ -35,3 +35,4 @@
 # other things
 .vscode/*
 .git/*
+# src/include/config.h

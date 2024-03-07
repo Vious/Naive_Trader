@@ -10,14 +10,15 @@ namespace Config {
 	static std::string APP_ID = "simnow_client_test";
     static std::string AUTH_CODE = "0000000000000000";
     static std::string USER_ID = "~~~";
-	static std::string USER_PRODUCT_INFO = "~~";
+	static std::string USER_PRODUCT_INFO = "~~~";
 	static std::string PASSWORD = "~~~";
     
-    static std::string CFFEX = "CFFEX";
-	static std::string CZCE = "CZCE";
-	static std::string DCE = "DCE";
-	static std::string INE = "INE";
-	static std::string SHFE = "SHFE";
+    static std::string CFFEX = "CFFEX";     //中金所
+	static std::string CZCE = "CZCE";       //郑商所
+	static std::string DCE = "DCE";         //大商所
+	static std::string INE = "INE";         //能源中心
+	static std::string SHFE = "SHFE";       //上期所
+    static std::string SGE = "SGE";         //广期所
 
 
 
