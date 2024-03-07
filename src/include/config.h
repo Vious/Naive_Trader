@@ -9,9 +9,9 @@ namespace Config {
 	static std::string BROKER_ID = "9999";
 	static std::string APP_ID = "simnow_client_test";
     static std::string AUTH_CODE = "0000000000000000";
-    static std::string USER_ID = "221692";
-	static std::string USER_PRODUCT_INFO = "vvCPTioous";
-	static std::string PASSWORD = "vvSimNowTrade123~";
+    static std::string USER_ID = "~~~";
+	static std::string USER_PRODUCT_INFO = "~~";
+	static std::string PASSWORD = "~~~";
     
     static std::string CFFEX = "CFFEX";
 	static std::string CZCE = "CZCE";
