@@ -132,12 +132,13 @@ private:
 
     void initialize() {
         for (int i = 0; i < stp_threads.size(); i++) {
-            auto worker = [this, i] {
+            auto worker = [this, i]() {
                 while (this->stp_runStatus) {
                     TaskType task;
                     bool shouldRun = false;
                     {
                         std::unique_lock<std::mutex> locker(stp_mutex);
+
                         if (this->stp_queue.empty()) {
                             this->stp_condVar.wait(locker);
                         }
@@ -151,6 +152,7 @@ private:
                 }
             };
 
+            stp_threads[i] = std::thread(worker);
 
         }
     }
