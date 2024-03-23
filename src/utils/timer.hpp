@@ -19,7 +19,6 @@ namespace NaiveTimer
 using FuncType = std::function<void()>;
 using DurationType = std::chrono::milliseconds;
 using SysClock = std::chrono::system_clock;
-// using Timestamp = std::chrono::time_point<SysClock>;
 
 struct Task {
     uint64_t task_id;
@@ -64,7 +63,6 @@ private:
     std::atomic<bool> isDone;
 
     uint64_t tm_curId;
-    // std::multimap<uint64_t, Task> tm_tasks;
     std::multimap<uint64_t, Task> tm_tasks;
 
     void run();
@@ -85,6 +83,7 @@ Timer::~Timer() {
 }
 
 void Timer::run() {
+    
     while(!isDone) {
         std::unique_lock<std::mutex> locker(tm_mutex);
         tm_condVar.wait(locker, [this]() -> bool {return !isDone || !tm_tasks.empty();});
@@ -95,12 +94,11 @@ void Timer::run() {
         uint64_t cur_time = std::chrono::duration_cast<DurationType>(SysClock::now().time_since_epoch()).count();
         std::multimap<uint64_t, Task>::iterator iter = tm_tasks.begin();
         uint64_t task_time = iter->first;
-
         if (cur_time >= task_time) {
             Task& cur_task = iter->second;
-
             if (cur_task.isValid) {
                 locker.unlock();
+                // std::cout << "running function...\n"; 
                 cur_task.func();
                 locker.lock();
                 
@@ -109,10 +107,12 @@ void Timer::run() {
                     Task new_task(cur_task.task_id, cur_task.period, std::move(cur_task.func), cur_task.repeatable);
                     tm_tasks.insert({when, new_task});
                 } 
+
             }
             tm_tasks.erase(iter);
 
         } else {
+            // std::cout << "waiting for running time...\n"; 
             tm_condVar.wait_for(locker, DurationType(task_time - cur_time));
         }
 
