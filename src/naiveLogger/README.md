@@ -1,0 +1,5 @@
+# A Naive Logger 
+
+This is my own naive and simple implemention of a c++ based logging library, with reference to [spdlog](https://github.com/gabime/spdlog) and [fmt](https://github.com/fmtlib/fmt). Thanks to their great contributions. I've learned a lot from their repos.
+
+### Basic structure
