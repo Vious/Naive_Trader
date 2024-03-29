@@ -77,6 +77,10 @@ level_num from_string(const std::string &name) {
 }
 
 
+/// 
+struct source_location {
+    
+}
 
 
     
