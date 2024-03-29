@@ -27,7 +27,7 @@ using err_handler = std::function<void(const std::string *err_msg)>;
 
 // using filename_t = std::wstring;
 using string_view_t = fmt::basic_string_view<char>;
-using memory_buf_t = fmt::basic_memory_buffer<char>;
+using memory_buf_t = fmt::basic_memory_buffer<char, 500>;
 
 template <typename... Args>
 using format_string_t = fmt::format_string<Args...>;
@@ -56,10 +56,6 @@ string_view_t("info", 4), string_view_t("warning", 7), string_view_t("error", 5)
 string_view_t("critical", 8), string_view_t("off", 3) 
 };
 
-// return the string_view type of log level
-const string_view_t& to_string_view(level_num level) {
-    return level_names[level];
-}
 
 // given a string of the level name, return level enum
 level_num from_string(const std::string &name) {
@@ -79,9 +75,38 @@ level_num from_string(const std::string &name) {
 
 /// 
 struct source_location {
-    
+    int line{0};
+    const char *filename{nullptr};
+    const char *funcname{nullptr};
+
+    source_location() = default;
+    source_location(const char *filename, int line, const char *funcname): filename(filename), line(line), funcname(funcname) {}
+
+    constexpr bool empty() {
+        return line == 0;
+    }
+};
+
+
+// to string_view
+
+// return the string_view type of log level
+const string_view_t& to_string_view(level_num level) {
+    return level_names[level];
+}
+
+constexpr string_view_t to_string_view(const memory_buf_t &buf) {
+    return string_view_t{buf.data(), buf.size()};
+}
+
+// constexpr string_view_t to_string_view(string_view_t str) {
+//     return str;
+// }
+
+template<typename T, typename... Args>
+inline fmt::basic_string_view<T> to_string_view(fmt::basic_format_string<T, Args...> fmat) {
+    return fmat;
 }
 
 
-    
 } // namespace naiveLogger
