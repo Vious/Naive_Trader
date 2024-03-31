@@ -8,6 +8,14 @@
 #include <string_view>
 #include <algorithm>
 #include <iterator>
+#include <cstring>
+#include <ctime>
+#include <cstdio>
+#include <cstdlib>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <thread>
+
 #include <fmt/core.h>
 #include <fmt/format.h>
 
@@ -25,7 +33,7 @@ using level_t = std::atomic<int>;
 using log_clock = std::chrono::system_clock;
 using err_handler = std::function<void(const std::string *err_msg)>;
 
-// using filename_t = std::wstring;
+using filename_t = std::string;
 using string_view_t = fmt::basic_string_view<char>;
 using memory_buf_t = fmt::basic_memory_buffer<char, 500>;
 
@@ -99,13 +107,54 @@ constexpr string_view_t to_string_view(const memory_buf_t &buf) {
     return string_view_t{buf.data(), buf.size()};
 }
 
-// constexpr string_view_t to_string_view(string_view_t str) {
-//     return str;
-// }
+constexpr string_view_t to_string_view(string_view_t str) {
+    return str;
+}
 
 template<typename T, typename... Args>
 inline fmt::basic_string_view<T> to_string_view(fmt::basic_format_string<T, Args...> fmat) {
     return fmat;
+}
+
+
+
+
+
+namespace ntm {
+    log_clock::time_point getNow() {
+        return log_clock::now();
+    }
+
+    // get local Time, localtime_r (linux)
+    // std::tm getLocalTime(const std::time_t &time_tt) {
+    //     std::tm l_tm;
+    //     localtime_r(&time_tt, &l_tm);
+    //     return l_tm;
+    // }
+
+    // get local Time, localtime_r (linux)
+    std::tm getLocalTime() {
+        std::time_t tm_now = time(nullptr);
+        std::tm l_tm;
+        localtime_r(&tm_now, &l_tm);
+        return l_tm;
+    }
+
+    // get gm time, gmtime_r (linux)
+    std::tm getgmTime() {
+        std::time_t tm_now = time(nullptr);
+        std::tm gm_tm;
+        gmtime_r(&tm_now, &gm_tm);
+        return gm_tm;
+    }
+
+}
+
+/// for file io 
+namespace fileIO {
+
+
+
 }
 
 
