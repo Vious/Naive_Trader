@@ -3,6 +3,7 @@
 #include <atomic>
 #include <memory>
 #include <chrono>
+#include <thread>
 #include <functional>
 #include <string>
 #include <string_view>
@@ -12,9 +13,11 @@
 #include <ctime>
 #include <cstdio>
 #include <cstdlib>
+// system call functions
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <thread>
+#include <unistd.h>
+#include <sys/syscall.h>
 
 #include <fmt/core.h>
 #include <fmt/format.h>
@@ -118,8 +121,16 @@ inline fmt::basic_string_view<T> to_string_view(fmt::basic_format_string<T, Args
 
 
 
+// get system environment variables
+// source https://github.com/gabime/spdlog
+std::string getEnv(const char *field) {
+    char *buf = getenv(field);
+    return buf? buf : std::string{};
+}
 
 
+
+// namespace ntm (for time)
 namespace ntm {
     log_clock::time_point getNow() {
         return log_clock::now();
@@ -148,7 +159,29 @@ namespace ntm {
         return gm_tm;
     }
 
-}
+    //calculate the minutes offsets of local time to utc time
+    int uts_offsets_minutes(const std::tm &tm) {
+        // const std::tm &localtm = getLocalTime();
+        // const std::tm &gmtm = getgmTime();
+
+        // int localt_year = localtm.tm_year + (1900 - 1);
+        // int gmt_year = gmtm.tm_year + (1900 - 1);
+
+        // // 
+        // long int days_diff = (localtm.tm_yday - gmtm.tm_yday) + 
+        //     ((localt_year >> 2) - (gmt_year >> 2)) - (localt_year / 100 - gmt_year / 100) +
+        //     ((localt_year / 100 >> 2) - (gmt_year / 100) >> 2);
+
+        // long int hours_diff = 24 * days_diff + (localtm.tm_hour - gmtm.tm_hour);
+        // long int minutes_diff = 60 * hours_diff + (localtm.tm_min - gmtm.tm_min);
+        // long int secs_diff = 60 * minutes_diff + (localtm.tm_sec - gmtm.tm_sec);
+
+        // return static_cast<int> (secs_diff / 60);
+        return static_cast<int>(tm.tm_gmtoff / 60);
+    }
+
+} // namespace ntm (for time)
+
 
 /// for file io 
 namespace fileIO {
@@ -160,9 +193,21 @@ namespace fileIO {
         return *fp == nullptr;      
     }
 
-    // get file size, linux code
-    int getFileSize(FILE *fp) {
-        
+    // get file size (for linux)
+    size_t getFileSize(FILE *file) {
+        if (file == nullptr) {
+            std::cout << "Failed to get the file, nullptr!\n";
+            return 111111;
+        } else {
+            // currently only work for x64 system
+            int fd = fileno(file);
+            struct stat64 st;
+            if (fstat64(fd, &st) == 0) {
+                return static_cast<size_t> (st.st_size);
+            }
+        }
+        std::cout << "Failed to get the size from fd.\n";
+        return 0;
     }
 
     int rename(const filename_t &ori_name, filename_t &tar_name) {
@@ -182,9 +227,66 @@ namespace fileIO {
         return pathExists(filename) ? remove(filename) : 0;
     }
 
+    // get directory name for a file
+    filename_t getDirName(const filename_t &path) {
+        size_t pos = path.find_last_of("/");
+        return pos != filename_t::npos ? path.substr(0, pos) : filename_t{};
+    }
+
+    // mkdir funtion
+    bool createDir(const filename_t &path) {
+        if(pathExists(path)) {
+            return true;
+        } else if(path.empty()){
+            return false;
+        } else {
+            size_t moving_pos = 0;
+            do {
+                auto cur_pos = path.find_first_of("/", moving_pos);
+                if (cur_pos == filename_t::npos) {
+                    cur_pos = path.size() - 1;
+                }
+                auto sub_dir = path.substr(0, cur_pos);
+                // calling mkdir function
+                if (!sub_dir.empty() && !pathExists(sub_dir) && mkdir(sub_dir.c_str(), 0777) == -1) {
+                    return false;
+                }
+                moving_pos = cur_pos + 1;
+            } while(moving_pos < path.size());
+        }
+
+        return true;
+    }
+
+    // file sync (linux)
+    bool fileSync(FILE *fp) {
+        return fsync(fileno(fp)) == 0;
+    }
 
 
-}
+} //namespace fileIO
+
+
+
+// namespace nthread, for thread related functions
+namespace nthread{
+    size_t getThreadId() {
+        return static_cast<size_t>(syscall(__NR_gettid));
+    }
+
+    void sleepForMillis(unsigned int millis) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(millis));
+    }
+
+    int getPid() {
+        return static_cast<int>(getpid());
+    }
+
+} // namespace nthread
+
+
+
+
 
 
 } // namespace naiveLogger
