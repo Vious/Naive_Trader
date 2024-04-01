@@ -152,6 +152,35 @@ namespace ntm {
 
 /// for file io 
 namespace fileIO {
+    // follow the folder sep for unix file system
+    // static const std::string::value_type folder_seps[] = "/";
+    
+    bool fopen_s(FILE **fp, const filename_t &filename, const filename_t &mode) {
+        *fp = fopen((filename.c_str()), mode.c_str());
+        return *fp == nullptr;      
+    }
+
+    // get file size, linux code
+    int getFileSize(FILE *fp) {
+        
+    }
+
+    int rename(const filename_t &ori_name, filename_t &tar_name) {
+        return std::rename(ori_name.c_str(), tar_name.c_str());
+    }
+
+    bool pathExists(const filename_t &filename) {
+        struct stat buffer;
+        return stat(filename.c_str(), &buffer) == 0;
+    }
+
+    int remove(const filename_t &filename) {
+        return std::remove(filename.c_str());
+    }
+
+    int removeIfExist(const filename_t &filename) {
+        return pathExists(filename) ? remove(filename) : 0;
+    }
 
 
 
