@@ -38,7 +38,8 @@ using err_handler = std::function<void(const std::string *err_msg)>;
 
 using filename_t = std::string;
 using string_view_t = fmt::basic_string_view<char>;
-using memory_buf_t = fmt::basic_memory_buffer<char, 500>;
+// or using memory_buf_t = std::string 
+using memory_buf_t = fmt::basic_memory_buffer<char, 250>;
 
 template <typename... Args>
 using format_string_t = fmt::format_string<Args...>;
