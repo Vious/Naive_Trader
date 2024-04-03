@@ -56,11 +56,23 @@ public:
         }
     }
 
+    const T &getFront() const {
+        assert(capacity > 0);
+        return que_vec[front];
+    }
+
     T &getFront() {
+        assert(capacity > 0);
         return que_vec[front]; 
     }
 
+    const T &getRear() const {
+        assert(capacity > 0);
+        return que_vec[(front + size_counter - 1) % capacity];
+    }
+
     T &getRear() {
+        assert(capacity > 0);        
         return que_vec[(front + size_counter - 1) % capacity];
     }
 
