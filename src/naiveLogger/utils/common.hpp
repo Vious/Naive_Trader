@@ -86,13 +86,13 @@ level_num from_string(const std::string &name) {
 
 
 /// 
-struct source_location {
+struct SourceLoc {
     int line{0};
     const char *filename{nullptr};
     const char *funcname{nullptr};
 
-    source_location() = default;
-    source_location(const char *filename, int line, const char *funcname): filename(filename), line(line), funcname(funcname) {}
+    constexpr SourceLoc() = default;
+    constexpr SourceLoc(const char *filename, int line, const char *funcname): filename(filename), line(line), funcname(funcname) {}
 
     constexpr bool empty() {
         return line == 0;

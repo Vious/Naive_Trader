@@ -10,14 +10,14 @@ namespace naiveLogger
 // log message
 struct LogMessage {
     LogMessage() = default;
-    LogMessage(log_clock::time_point log_time, source_location loc, string_view_t log_name, level_num lvl, string_view_t msg);
-    LogMessage(source_location loc, string_view_t log_name, level_num lvl, string_view_t msg);
+    LogMessage(log_clock::time_point log_time, SourceLoc loc, string_view_t log_name, level_num lvl, string_view_t msg);
+    LogMessage(SourceLoc loc, string_view_t log_name, level_num lvl, string_view_t msg);
     LogMessage(string_view_t log_name, level_num lvl, string_view_t msg);
 
     LogMessage(const LogMessage &other) = default;
     LogMessage &operator=(const LogMessage &other) = default;
 
-    source_location src_loc;
+    SourceLoc src_loc;
     string_view_t log_name;
     level_num level{level_num::off};
     log_clock::time_point time;
@@ -34,13 +34,13 @@ struct LogMessage {
 
 };
 
-LogMessage::LogMessage(log_clock::time_point log_time, source_location loc, string_view_t log_name, level_num lvl, string_view_t msg): time(log_time), src_loc(loc), log_name(log_name), level(lvl), payload(msg) {
+LogMessage::LogMessage(log_clock::time_point log_time, SourceLoc loc, string_view_t log_name, level_num lvl, string_view_t msg): time(log_time), src_loc(loc), log_name(log_name), level(lvl), payload(msg) {
     this->thread_id = naiveLogger::nthread::getThreadId();
 }
 
-LogMessage::LogMessage(source_location loc, string_view_t log_name, level_num lvl, string_view_t msg): LogMessage(ntm::getNow(), loc, log_name, lvl, msg) {}
+LogMessage::LogMessage(SourceLoc loc, string_view_t log_name, level_num lvl, string_view_t msg): LogMessage(ntm::getNow(), loc, log_name, lvl, msg) {}
 
-LogMessage::LogMessage(string_view_t log_name, level_num lvl, string_view_t msg): LogMessage(ntm::getNow(), source_location{}, log_name, lvl, msg) {}
+LogMessage::LogMessage(string_view_t log_name, level_num lvl, string_view_t msg): LogMessage(ntm::getNow(), SourceLoc{}, log_name, lvl, msg) {}
 
 
 
@@ -79,7 +79,7 @@ MessageBuffer::MessageBuffer(MessageBuffer &&other_msg_buf) : LogMessage(other_m
 }
 
 MessageBuffer &MessageBuffer::operator=(const MessageBuffer &msg_buf) {
-    MessageBuffer::operator=(msg_buf);
+    LogMessage::operator=(msg_buf);
     buffer.clear();
     buffer.append(msg_buf.buffer.data(), msg_buf.buffer.data() + msg_buf.buffer.size());
     updateStringViews();
@@ -87,7 +87,7 @@ MessageBuffer &MessageBuffer::operator=(const MessageBuffer &msg_buf) {
 }
 
 MessageBuffer &MessageBuffer::operator=(MessageBuffer &&other_msg_buf) {
-    MessageBuffer::operator=(other_msg_buf);
+    LogMessage::operator=(other_msg_buf);
     buffer = std::move(other_msg_buf.buffer);
     updateStringViews();
     return *this;

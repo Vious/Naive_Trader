@@ -10,123 +10,88 @@ template <typename T>
 class CircularQueue {
 public:
     CircularQueue() = default;
-    explicit CircularQueue(size_t max_size) : capacity(max_size), que_vec(capacity) {}
+    explicit CircularQueue(size_t max_size) : capacity(max_size + 1), que_vec(capacity) {}
     CircularQueue(const CircularQueue &circ_q) = default;
     CircularQueue &operator=(const CircularQueue &circ_q) = default;
 
     // move copy
-    CircularQueue(CircularQueue &&other_q) {
-        copyMoveable(std::move(other_q));
+    CircularQueue(CircularQueue &&other) {
+        copyMoveable(std::move(other));
     }
-
-    CircularQueue &operator=(CircularQueue &&other_q) {
-        copyMoveable(std::move(other_q));
+    CircularQueue &operator=(CircularQueue &&other) {
+        copyMoveable(std::move(other));
         return *this;
     }
 
-    bool enQueue(T &&item) {
-        if (isFull()) {
-            std::cout << "Failed to enqueue, FULL!\n";
-            return false;
-        } else {
-            size_t idx = (front + size_counter) % capacity;
-            que_vec[idx] = std::move(item);
-            size_counter++;
-            return true;
-            // if (capacity > 0) {
-            //     size_t idx = (front + size_counter) % capacity;
-            //     que_vec[idx] = std::move(item);
-            //     size_counter++;
-            //     return true;
-            // } else {
-            //     std::cout << "Wrong setting, capacity less than 0!\n";
-            //     return false;
-            // }
+    void enQueue(T &&item) {
+        if (capacity > 0) {
+            que_vec[rear] = std::move(item);
+            rear = (rear + 1) % capacity;
+
+            // check if it reaches the front
+            if (rear == front) {
+                front = (front + 1) % capacity;
+                oversize_count++;
+            }
         }
     }
 
-    bool deQueue() {
-        if(isEmpty()) {
-            std::cout << "Empty queue\n";
-            return false;
-        } else {
-            front = (front + 1) % capacity;
-            size_counter--;
-            return true;
-        }
-    }
-
-    const T &getFront() const {
-        assert(capacity > 0);
-        return que_vec[front];
-    }
-
-    T &getFront() {
-        assert(capacity > 0);
-        return que_vec[front]; 
-    }
-
-    const T &getRear() const {
-        assert(capacity > 0);
-        return que_vec[(front + size_counter - 1) % capacity];
-    }
-
-    T &getRear() {
-        assert(capacity > 0);        
-        return que_vec[(front + size_counter - 1) % capacity];
-    }
-
-    const T &at(size_t idx) {
-        assert(idx < getSize());
-        return que_vec[(front + idx) % capacity];
-    }
-
-    size_t getSize() const {
-        return size_counter;
-    }
-
-    // void resetCounter() {
-    //     size_counter = 0;
-    // }
-    void clearQueue() {
-        front = 0;
-        size_counter = 0;
+    void deQueue() {
+        front = (front + 1) % capacity;
     }
 
     bool isEmpty() const {
-        return size_counter == 0;
-        // return front == rear;
+        return front == rear;
     }
 
     bool isFull() const {
-        return size_counter == capacity;
+        if (capacity > 0) {
+            return ((rear + 1) % capacity) == front;
+        }
+        return false;
     }
 
+    size_t getSize() const {
+        if (rear >= front) {
+            return rear - front;
+        } else {
+            return capacity - (front - rear);
+        }
+    }
 
+    const T &at(size_t idx) const {
+        assert(idx < getSize());
+        return que_vec[(front + 1) % capacity];
+    }
+
+    const T &getFront() const {
+        return que_vec[front];
+    }
+    T &getFront() {
+        return que_vec[front];
+    }
 
 
 private:
     size_t capacity = 0;
-    size_t size_counter = 0;
+    size_t oversize_count = 0;
     std::vector<T> que_vec;
     typename std::vector<T>::size_type front = 0;
-    // typename std::vector<T>::size_type rear = 0;
+    typename std::vector<T>::size_type rear = 0;
 
     void copyMoveable(CircularQueue &&other) {
         capacity = other.capacity;
-        size_counter = other.size_counter;
+        oversize_count = other.oversize_count;
         front = other.front;
-        // rear = other.rear;
+        rear = other.rear;
         que_vec = std::move(other.que_vec);
 
         // disable the data in &other
         other.capacity = 0;
         other.front = 0;
-        // other.rear = 0;
-        other.size_counter = 0;
+        other.rear = 0;
+        other.oversize_count = 0;
     }
-
-
 
 };
 
