@@ -6,6 +6,7 @@
 #include <utility>
 #include <cstring>
 #include <vector>
+#include <ostream>
 
 // #ifndef EXPORT_FLAG
 // #define EXPORT_FLAG __attribute__((__visibility__("default")))
