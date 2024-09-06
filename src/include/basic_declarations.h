@@ -7,6 +7,8 @@
 #include <cstring>
 #include <vector>
 #include <ostream>
+#include <cmath>
+#include <numeric>
 
 // #ifndef EXPORT_FLAG
 // #define EXPORT_FLAG __attribute__((__visibility__("default")))
@@ -27,11 +29,15 @@ namespace naiveTrader
 
 struct ExCode;
 
-struct DailyMarketData;
-
 struct TickData;
 
+struct PositionCell;
+
 struct PositionData;
+
+struct OrderData;
+
+struct DailyMarketData;
 
 
 enum class OrderStatus;
