@@ -351,9 +351,74 @@ struct OrderData {
 
 const OrderData emptyOrder;
 
-// struct OrderStatistics {
-    
-// };
+struct OrderStatistics {
+    // Place order amount
+    uint32_t placeOrdAmount;
 
+    // delegated order amount
+    uint32_t delegatedAmount;
+
+    // Executed order amount
+    uint32_t executAmount;
+
+    // cancelled order amount
+    uint32_t cancelAmount;
+
+    // Error order amount
+    uint32_t errorAmount;
+
+    OrderStatistics(): placeOrdAmount(0), delegatedAmount(0), executAmount(0), \
+        cancelAmount(0), errorAmount(0) {}
+
+public:
+    std::ostream &operator >> (std::ostream &os) {
+        os << placeOrdAmount << delegatedAmount << executAmount << cancelAmount << errorAmount;
+        return os;
+    }
+
+};
+
+enum class ErrorType {
+    ERR_PLACE_ORDER,
+    ERR_CANCEL_ORDER,
+    ERR_OTHER,
+};
+
+enum class ErrorCode : uint8_t
+{
+    EC_SUCCESS,
+    EC_FAILURE,
+    EC_ORDER_FIELD_ERROR = 23U, // Order field error
+    EC_POSITION_NOT_ENOUGH = 30U, // Insufficient position
+    EC_MARGIN_NOT_ENOUGH = 31U, // Insufficient margin
+    EC_STATE_NOT_READY = 32, // Incorrect state
+};
+
+struct DailyMarketData {
+    ExCode code;
+
+    std::map<double_t, uint32_t> volumeDistribution;
+
+    TickData lastTickInfo;
+
+    double_t getControlPrice() const {
+        double_t ctrlPrice = lastTickInfo.price;
+        uint32_t maxVolume = 0;
+        for (const auto &iter : volumeDistribution) {
+            if (iter.second > maxVolume) {
+                maxVolume = iter.second;
+                ctrlPrice = iter.first;
+            }
+        }
+        return ctrlPrice;
+    }
+    
+    void clear() {
+        volumeDistribution.clear();
+    }
+
+};
+
+const DailyMarketData emptyDailyMarket;
 
 }

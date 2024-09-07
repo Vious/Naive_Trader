@@ -9,6 +9,7 @@
 #include <ostream>
 #include <cmath>
 #include <numeric>
+#include <map>
 
 // #ifndef EXPORT_FLAG
 // #define EXPORT_FLAG __attribute__((__visibility__("default")))
@@ -41,6 +42,8 @@ enum class DirectionType;
 enum class EventType;
 
 enum class ErrorType;
+
+enum class ErrorCode;
 
 struct ExCode;
 
