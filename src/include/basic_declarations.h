@@ -27,6 +27,21 @@
 namespace naiveTrader
 {
 
+typedef uint64_t estid_t;
+
+constexpr estid_t INVALID_ESTID = 0x0LLU;
+
+
+enum class OrderType;
+
+enum class PositionOffsetType;
+
+enum class DirectionType;
+
+enum class EventType;
+
+enum class ErrorType;
+
 struct ExCode;
 
 struct TickData;
@@ -37,17 +52,8 @@ struct PositionData;
 
 struct OrderData;
 
+struct OrderStatistics;
+
 struct DailyMarketData;
-
-
-enum class OrderStatus;
-
-enum class PositionOffsetType;
-
-enum class TradeDirection;
-
-enum class EventType;
-
-enum class ErrorType;
 
 } // namespace naiveTrader
