@@ -288,5 +288,72 @@ struct PositionData {
 const PositionData emptyPosition;
 
 
+enum class OrderType {
+    OT_NORMAL = '0', // normal order
+    OT_FOK, // /* an order to buy or sell a contract that must be executed immediately in its entirety; otherwise, the entire order will be canceled (i.e., no partial execution of the order is allowed). */
+    OT_FAK, // /* immediately executed against resting orders. If the order cannot be fully filled, the remaining balance is canceled.  */
+
+};
+
+enum class PosOffsetType {
+    POFFT_OPEN = '0', // /* open position */
+    POFFT_CLOSE,      // /* close position (yesterday's position for SHFE) */
+    POFFT_CLSTD       // /* close today's position */  
+};
+
+enum class DirectionType {
+    DT_LONG = '0', // LONG
+    DT_SHORT       // SHORT
+};
+
+struct OrderData {
+    estid_t estId;
+    ExCode code;
+    std::string unitId;
+    
+    uint32_t totalVolume;
+    uint32_t lastVolume;
+    
+    dayTime_t creatTime;
+
+    PosOffsetType offset;
+    DirectionType direction;
+    
+    double_t price;
+
+    OrderData() : estId(INVALID_ESTID), offset(PosOffsetType::POFFT_OPEN), direction(DirectionType::DT_LONG), totalVolume(0), lastVolume(0), creatTime(0), price(.0f) {}
+
+    bool isValid() const {
+        return estId == INVALID_ESTID;
+    }
+
+    bool isBuy() const {
+        if (direction == DirectionType::DT_LONG && offset == PosOffsetType::POFFT_OPEN) {
+            return true;
+        }
+        if (direction == DirectionType::DT_SHORT && (offset == PosOffsetType::POFFT_CLSTD || offset == PosOffsetType::POFFT_CLOSE)) {
+            return true;
+        }
+        return false;
+    }
+
+    bool isSell() const {
+        if (direction == DirectionType::DT_SHORT && offset == PosOffsetType::POFFT_OPEN) {
+            return true;
+        }
+        if (direction == DirectionType::DT_LONG && (offset == PosOffsetType::POFFT_CLOSE || offset == PosOffsetType::POFFT_CLSTD)) {
+            return true;
+        }
+        return false;
+    }
+
+};
+
+const OrderData emptyOrder;
+
+// struct OrderStatistics {
+    
+// };
+
 
 }
