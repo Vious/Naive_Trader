@@ -42,4 +42,68 @@ protected:
 
 };
 
+template <typename T, size_t N>
+class EventQueue : public EventDispatcher<T> {
+private:
+    jnk0le::Ringbuffer<EventData<T>, N> mEventQ;
+
+    void triggerEvent(EventData<T> &data) {
+        while(!mEventQ.insert(data)) {}
+    }
+
+    template<typename Arg, typename... Types>
+    void triggerEvent(EventData<T> &data, const Arg &firstArg, const Types&... args) {
+        data.params.emplace_back(firstArg);
+        triggerEvent(data, args...);
+    }
+
+public:
+    template<typename... Types>
+    void triggerEvent(T type, const Types &... args) {
+        EventData<T> data;
+        data.type = type;
+        triggerEvent(data, args...);
+    }
+
+    void process() {
+        EventData<T> data;
+        while(mEventQ.remove(data)) {
+            this->trigger(data.type, data.params);
+        }
+    }
+
+    bool isEmpty() const {
+        return mEventQ.isEmpty();
+    }
+
+    bool isFull() const {
+        return mEventQ.isFull();
+    }
+
+};
+
+
+template<typename T>
+class DirectEvent : public EventDispatcher<T> {
+private:
+    void triggerEvent(EventData<T> &data) {
+        this->trigger(data.type, data.params);
+    }
+
+    template<typename Arg, typename... Types>
+    void triggerEvent(EventData<T> &data, const Arg &firstArg, const Types&... args) {
+        data.params.emplace_back(firstArg);
+        triggerEvent(data, args...);
+    }
+
+public:
+    template<typename... Types>
+    void triggerEvent(T type, const Types&... args) {
+        EventData<T> data;
+        data.type = type;
+        triggerEvent(data, args...);
+    }
+
+};
+
 }
