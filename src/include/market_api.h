@@ -1,5 +1,3 @@
-#pragma once
-
 #include "basic_declarations.h"
 #include "define.hpp"
 #include "event_helper.hpp"
@@ -8,9 +6,9 @@
 namespace naiveTrader 
 {
 
-enum class MarketEventType {
-    MET_Invalid,
-    MET_TickRecv
+enum class MarketEventType : int {
+    MET_Invalid = -1,
+    MET_TickRecv = 1
 };
 
 /* Api for market  */
@@ -42,12 +40,13 @@ public:
     virtual ~ActualMarket() {}
 
 protected:
+    ActualMarket(const std::shared_ptr<std::unordered_map<std::string, std::string>> &aExcgIdMap) : excgIdMap(aExcgIdMap) {}
+
     std::shared_ptr<std::unordered_map<std::string, std::string>> excgIdMap;
 
-    ActualMarket(const std::shared_ptr<std::unordered_map<std::string, std::string>> &aExcgIdMap) : excgIdMap(aExcgIdMap) {}
 };
 
-class SyncActualMarket : public ActualMarket, public EventDispatcher<MarketEventType> {
+class SyncActualMarket : public ActualMarket, public DirectEvent<MarketEventType> {
 protected:
     SyncActualMarket(const std::shared_ptr<std::unordered_map<std::string, std::string>> &aExcgIdMap) : ActualMarket(aExcgIdMap) {}
 
@@ -58,6 +57,42 @@ protected:
     virtual void clearEvent() override {
         this->clearHandler();
     }
+
+};
+
+class Async_ActualMarket : public ActualMarket, public EventSource<MarketEventType, 1024> {
+protected:
+    Async_ActualMarket(const std::shared_ptr<std::unordered_map<std::string, std::string>> &aExcgIdMap) : ActualMarket(aExcgIdMap) {}
+
+    virtual void update() override {
+        this->process();
+    }
+
+    virtual void bindEvent(MarketEventType type, std::function<void(const std::vector<std::any>&)> handler) override {
+        this->addHandler(type, handler);
+    }
+
+    virtual void clearEvent() {
+        this->clearHandler();
+    }
+
+};
+
+class DummyMarket : public MarketAPI, public DirectEvent<MarketEventType> {
+public:
+    virtual ~DummyMarket() {}
+
+    virtual void bindEvent(MarketEventType type, std::function<void(const std::vector<std::any>&)> handler) override {
+        this->addHandler(type, handler);
+    }
+
+    virtual void clearEvent() {
+        this->clearHandler();
+    }
+
+    virtual void play(uint32_t tradingDay, std::function<void(const TickData&)> publishCallback) = 0;
+
+    virtual bool isFinished() const = 0;
 
 };
 

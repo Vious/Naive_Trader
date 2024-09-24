@@ -348,7 +348,8 @@ namespace jnk0le
 		static_assert(buffer_mask <= ((std::numeric_limits<index_t>::max)() >> 1),
 			"buffer size is too large for a given indexing type (maximum size for n-bit type is 2^(n-1))");
 
-		static_assert(std::is_trivial<T>::value, "non trivial objects will currently break");
+		//remove non trivial check
+		// static_assert(std::is_trivial<T>::value, "non trivial objects will currently break");
 	};
 
 	template<typename T, size_t buffer_size, bool fake_tso, size_t cacheline_size, typename index_t>

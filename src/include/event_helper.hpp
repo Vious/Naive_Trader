@@ -43,7 +43,7 @@ protected:
 };
 
 template <typename T, size_t N>
-class EventQueue : public EventDispatcher<T> {
+class EventSource : public EventDispatcher<T> {
 private:
     jnk0le::Ringbuffer<EventData<T>, N> mEventBuffer;
 

@@ -44,7 +44,7 @@ enum class EventType;
 
 enum class ErrorType;
 
-enum class ErrorCode;
+enum class ErrorCode : uint8_t;
 
 struct ExCode;
 

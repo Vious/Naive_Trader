@@ -384,7 +384,7 @@ enum class ErrorType {
     ERR_OTHER,
 };
 
-enum class ErrorCode {
+enum class ErrorCode : uint8_t{
     EC_SUCCESS,
     EC_FAILURE,
     EC_ORDER_FIELD_ERROR = 23U, // Order field error
