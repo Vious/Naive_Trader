@@ -4,7 +4,7 @@
 #include <map>
 #include <any>
 #include <functional>
-#include "ringbuffer.hpp"
+#include "../utils/ringbuffer.hpp"
 
 namespace naiveTrader 
 {
@@ -34,7 +34,7 @@ public:
 protected:
     void trigger(T type, const std::vector<std::any> &params) {
         auto iter = mHandlerMap.equal_range(type);
-        when(iter.first != iter.second) {
+        while(iter.first != iter.second) {
             iter.first->second(params);
             iter.first++;
         }
@@ -45,10 +45,10 @@ protected:
 template <typename T, size_t N>
 class EventQueue : public EventDispatcher<T> {
 private:
-    jnk0le::Ringbuffer<EventData<T>, N> mEventQ;
+    jnk0le::Ringbuffer<EventData<T>, N> mEventBuffer;
 
     void triggerEvent(EventData<T> &data) {
-        while(!mEventQ.insert(data)) {}
+        while(!mEventBuffer.insert(data)) {}
     }
 
     template<typename Arg, typename... Types>
@@ -67,17 +67,17 @@ public:
 
     void process() {
         EventData<T> data;
-        while(mEventQ.remove(data)) {
+        while(mEventBuffer.remove(data)) {
             this->trigger(data.type, data.params);
         }
     }
 
     bool isEmpty() const {
-        return mEventQ.isEmpty();
+        return mEventBuffer.isEmpty();
     }
 
     bool isFull() const {
-        return mEventQ.isFull();
+        return mEventBuffer.isFull();
     }
 
 };
