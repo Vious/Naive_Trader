@@ -4,7 +4,7 @@
 #include <random>
 
 #include "../utils/ringbuffer.hpp"
-
+#include "../include/market_api.h"
 struct MarketData
 {
     /* data */
