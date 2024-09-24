@@ -32,19 +32,33 @@ public:
     virtual ~MarketAPI() {};
 };
 
-class AcutalMarket : public MarketAPI {
+class ActualMarket : public MarketAPI {
 public:
 
     virtual bool login() = 0;
 
     virtual bool logout() = 0;
 
-    virtual ~AcutalMarket() {}
+    virtual ~ActualMarket() {}
 
 protected:
-    
+    std::shared_ptr<std::unordered_map<std::string, std::string>> excgIdMap;
 
+    ActualMarket(const std::shared_ptr<std::unordered_map<std::string, std::string>> &aExcgIdMap) : excgIdMap(aExcgIdMap) {}
 };
 
+class SyncActualMarket : public ActualMarket, public EventDispatcher<MarketEventType> {
+protected:
+    SyncActualMarket(const std::shared_ptr<std::unordered_map<std::string, std::string>> &aExcgIdMap) : ActualMarket(aExcgIdMap) {}
+
+    virtual void bindEvent(MarketEventType type, std::function<void(const std::vector<std::any>&)> handler) override {
+        this->addHandler(type, handler);
+    }
+
+    virtual void clearEvent() override {
+        this->clearHandler();
+    }
+
+};
 
 }
