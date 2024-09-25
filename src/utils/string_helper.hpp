@@ -5,6 +5,8 @@
 
 namespace naiveTrader
 {
+namespace StringHelper
+{
 
 std::vector<std::string> split(const std::string &str, char delimiter) {
     std::vector<std::string> tokens;
@@ -55,6 +57,8 @@ std::string toString(const std::vector<T> &values) {
     return res;
 }
 
+    
+} // namespace StringHelper
     
 } // namespace naiveTrader
 
