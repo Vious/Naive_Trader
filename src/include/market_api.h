@@ -35,7 +35,7 @@ public:
 
     virtual bool login() = 0;
 
-    virtual bool logout() = 0;
+    virtual void logout() = 0;
 
     virtual ~ActualMarket() {}
 
@@ -60,9 +60,9 @@ protected:
 
 };
 
-class Async_ActualMarket : public ActualMarket, public EventSource<MarketEventType, 1024> {
+class AsyncActualMarket : public ActualMarket, public EventSource<MarketEventType, 1024> {
 protected:
-    Async_ActualMarket(const std::shared_ptr<std::unordered_map<std::string, std::string>> &aExcgIdMap) : ActualMarket(aExcgIdMap) {}
+    AsyncActualMarket(const std::shared_ptr<std::unordered_map<std::string, std::string>> &aExcgIdMap) : ActualMarket(aExcgIdMap) {}
 
     virtual void update() override {
         this->process();
@@ -82,6 +82,7 @@ class DummyMarket : public MarketAPI, public DirectEvent<MarketEventType> {
 public:
     virtual ~DummyMarket() {}
 
+    /* for binding events */
     virtual void bindEvent(MarketEventType type, std::function<void(const std::vector<std::any>&)> handler) override {
         this->addHandler(type, handler);
     }
