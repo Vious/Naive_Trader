@@ -8,7 +8,7 @@ namespace naiveTrader
 namespace StringHelper
 {
 
-std::vector<std::string> split(const std::string &str, char delimiter) {
+inline std::vector<std::string> split(const std::string &str, char delimiter) {
     std::vector<std::string> tokens;
     size_t startPos = 0, endPos;
     std::string aToken;
@@ -21,7 +21,7 @@ std::vector<std::string> split(const std::string &str, char delimiter) {
     return tokens;
 }
 
-std::vector<std::string> split(const std::string &str, std::string delimiter) {
+inline std::vector<std::string> split(const std::string &str, std::string delimiter) {
     std::vector<std::string> tokens;
     size_t startPos = 0, endPos, delimLength = delimiter.length();
     std::string aToken;
@@ -34,22 +34,22 @@ std::vector<std::string> split(const std::string &str, std::string delimiter) {
     return tokens;
 }
 
-std::string toString(const char *value) {
+inline std::string toString(const char *value) {
     return std::string(value);
 }
 
-std::string toString(const std::string &value) {
+inline std::string toString(const std::string &value) {
     return value;
 }
 
 /* only support primitives !!! */
 template <typename T>
-std::string toString(const T &value) {
+inline std::string toString(const T &value) {
     return std::to_string(value);
 }
 
 template <typename T>
-std::string toString(const std::vector<T> &values) {
+inline std::string toString(const std::vector<T> &values) {
     std::string res;
     for (auto val : values) {
         res.append(val);
