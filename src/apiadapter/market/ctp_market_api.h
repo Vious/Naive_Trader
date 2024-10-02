@@ -8,6 +8,7 @@
 #include "../../include/market_api.h"
 #include "../../include/event_helper.hpp"
 #include "../../include/params.hpp"
+#include "../../utils/dll_helper.hpp"
 
 
 namespace naiveTrader
