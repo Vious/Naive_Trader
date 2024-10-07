@@ -32,7 +32,7 @@ public:
 
     static ProcessHandler getSymbol(DLLHandler handler, const char *name) {
         if (handler == NULL) {
-            return;
+            return NULL;
         }
         return dlsym(handler, name);
     }
