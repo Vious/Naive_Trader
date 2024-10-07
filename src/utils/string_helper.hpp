@@ -42,7 +42,7 @@ inline std::string toString(const std::string &value) {
     return value;
 }
 
-/* only support primitives !!! */
+/* end function!!! */
 template <typename T>
 inline std::string toString(const T &value) {
     return std::to_string(value);
@@ -56,6 +56,70 @@ inline std::string toString(const std::vector<T> &values) {
     }
     return res;
 }
+
+template<typename T>
+static std::string extractToString(const T& value) {
+    return toString(value);
+}
+
+template<typename A, typename... Types>
+static void extractToString(std::vector<std::string>& data, const A& firstArg, const Types&... args) {
+    data.emplace_back(toString(firstArg));
+    extractToString(data, args...);
+}
+
+template<typename... T>
+inline std::string format(const std::string& s, const T &... values) {
+    std::vector<std::string> args;
+    extractToString(args, values...);
+    std::string result = s;
+    char open = '{';
+    char close = '}';
+    bool is_open = false;
+    size_t index = 0;
+    size_t index_length = 0;
+    size_t start = 0;
+
+    for (size_t i = 0; i < result.length(); ++i) {
+        char c = result.at(i);
+
+        if (c == '\\') {
+            i += 1;
+        }
+        else if (c == open) {
+            is_open = true;
+            start = i;
+        }
+        else if (c == close) {
+            size_t one = result.length();
+            result.erase(start, i + 1 - start);
+
+            if (index_length > 0) {
+                result.insert(start, args.at(index));
+            }
+
+            size_t two = result.length();
+
+            i -= one - two;
+            is_open = false;
+            index = 0;
+            index_length = 0;
+        }
+        else if (is_open) {
+            int n = c - '0';
+
+            if (n < 0 || n > 9) {
+                continue;
+            }
+
+            index = (index * 10) + n;
+            ++index_length;
+        }
+    }
+
+    return result;
+}
+
 
     
 } // namespace StringHelper

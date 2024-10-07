@@ -27,10 +27,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #define NANO_LOG_HEADER_GUARD
 
 #include <thread>
-#include <log_wapper.hpp>
+#include "../include/log_wrapper.hpp"
 
 namespace nanolog
 {
+using namespace naiveTrader;
 	enum class LogField : uint8_t
 	{
 		TIME_SPAMP = 0B00000001,
@@ -50,7 +51,7 @@ namespace nanolog
 	class LogWriter
 	{
 	public:
-		virtual void write(const NanoLogLine& logline, uint8_t field) = 0;
+		virtual void write(const naiveTrader::NanoLogLine& logline, uint8_t field) = 0;
 	};
 
 	class NanoLogger
@@ -64,9 +65,9 @@ namespace nanolog
 
 		~NanoLogger();
 		
-		void set_option(LogLevel level, uint8_t field, uint8_t print);
+		void set_option(naiveTrader::LogLevel level, uint8_t field, uint8_t print);
 
-		bool is_logged(LogLevel level);
+		bool is_logged(naiveTrader::LogLevel level);
 
 		void pop();
 		
@@ -85,12 +86,12 @@ namespace nanolog
 
 		std::unique_ptr<std::thread> _thread;
 
-		LoglinePool _lp;
-		LoglineQueue _mq;
+		naiveTrader::LogLinePool _lp;
+		naiveTrader::LogLineQueue _mq;
 
 		std::atomic<bool> _is_runing = false;
 		
-		LogLevel _level = LogLevel::LLV_TRACE;
+		naiveTrader::LogLevel _level = naiveTrader::LogLevel::LOGLV_TRACE;
 		uint8_t _field = 0U;
 		uint8_t _print = 0U;
 	};

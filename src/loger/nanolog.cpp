@@ -24,18 +24,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 
 #include "nanolog.hpp"
-#include <mpsc_queue.hpp>
+#include "../utils/mpsc_queue.hpp"
 #include <cstring>
 #include <chrono>
 #include <ctime>
 #include <atomic>
 #include <fstream>
 #include <iostream>
-#include <log_wapper.hpp>
+#include "../include/log_wrapper.hpp"
 
 namespace
 {
-
+using namespace naiveTrader;
 
 	/* I want [2016-10-13 00:01:23.528514] */
 	void format_timestamp(std::ostream& os, uint64_t timestamp)
@@ -69,51 +69,48 @@ namespace
 namespace nanolog
 {
 	
-	char const* level_to_string(LogLevel level)
-	{
+	char const* level_to_string(naiveTrader::LogLevel level) {
 
-		switch (level)
-		{
-		case LogLevel::LLV_TRACE:
+		switch (level) {
+		case naiveTrader::LogLevel::LOGLV_TRACE:
 			return "TRACE";
-		case LogLevel::LLV_DEBUG:
+		case naiveTrader::LogLevel::LOGLV_DEBUG:
 			return "DEBUG";
-		case LogLevel::LLV_INFO:
+		case naiveTrader::LogLevel::LOGLV_INFO:
 			return "INFO";
-		case LogLevel::LLV_WARNING:
+		case naiveTrader::LogLevel::LOGLV_WARNING:
 			return "WARNING";
-		case LogLevel::LLV_ERROR:
+		case naiveTrader::LogLevel::LOGLV_ERROR:
 			return "ERROR";
-		case LogLevel::LLV_FATAL:
+		case naiveTrader::LogLevel::LOGLV_FATAL:
 			return "FATAL";
 		}
 		return "XXXX";
 	}
 
 
-	void logline_stringify(std::ostream& os, const NanoLogLine& logline,uint8_t field)
-	{
+	void logline_stringify(std::ostream& os, const naiveTrader::NanoLogLine& logline,uint8_t field) {
 		if (field & static_cast<uint8_t>(LogField::TIME_SPAMP))
 		{
-			format_timestamp(os, logline._timestamp);
+			format_timestamp(os, logline.mTimestamp);
 		}
 		if (field & static_cast<uint8_t>(LogField::THREAD_ID))
 		{
-			os << '[' << logline._thread_id << ']';
+			os << '[' << logline.mThreadId << ']';
 		}
 		if (field & static_cast<uint8_t>(LogField::LOG_LEVEL))
 		{
-			os << '[' << level_to_string(logline._log_level) << ']';
+			os << '[' << level_to_string(logline.m_logLevel) << ']';
 		}
 		if (field & static_cast<uint8_t>(LogField::SOURCE_FILE))
 		{
-			os << '[' << logline._source_file << ':' << logline._source_line << "] ";
+			os << '[' << logline.m_sourceFile << ':' << logline.m_sourceFile << "] ";
 		}
 		if (field & static_cast<uint8_t>(LogField::FUNCTION))
 		{
-			os << '[' << logline._function << ':' << logline._source_line << "] ";
+			os << '[' << logline.mFunc << ':' << logline.m_sourceLine << "] ";
 		}
-		stream_extractor sd(const_cast<unsigned char*>(logline._buffer), LOG_BUFFER_SIZE);
+		stream_extractor sd(const_cast<unsigned char*>(logline.mBuffer), LOG_BUFFER_SIZE);
 		sd.out(os);
 		os << std::endl;
 		//os.flush();
@@ -129,7 +126,7 @@ namespace nanolog
 			std::ios::sync_with_stdio(false);
 		}
 
-		virtual void write(const NanoLogLine& logline, uint8_t field)
+		virtual void write(const naiveTrader::NanoLogLine& logline, uint8_t field)
 		{
 			logline_stringify(std::cout, logline, field);
 		}
@@ -158,7 +155,7 @@ namespace nanolog
 				m_os->close();
 			}
 		}
-		virtual void write(const NanoLogLine& logline,uint8_t field)
+		virtual void write(const naiveTrader::NanoLogLine& logline,uint8_t field)
 		{
 			auto pos = m_os->tellp();
 			logline_stringify(*m_os, logline, field);
@@ -202,7 +199,7 @@ namespace nanolog
 		, _is_runing(false)
 		, _mq()
 		, _lp(pool_size)
-		, _level(LogLevel::LLV_TRACE)
+		, _level(naiveTrader::LogLevel::LOGLV_TRACE)
 		, _field(0)
 		, _print(0)
 	{
@@ -228,7 +225,7 @@ namespace nanolog
 	{
 
 		
-		while (_is_runing || !_mq.is_empty())
+		while (_is_runing || !_mq.isEmpty())
 		{
 			NanoLogLine* logline = _mq.pop();
 			if (logline)
@@ -268,14 +265,14 @@ namespace nanolog
 		_mq.push(std::move(line));
 	}
 
-	void NanoLogger::set_option(LogLevel level,uint8_t field,uint8_t print)
+	void NanoLogger::set_option(naiveTrader::LogLevel level,uint8_t field,uint8_t print)
 	{
 		_level = level;
 		_field = field;
 		_print = print;
 	}
 
-	bool NanoLogger::is_logged(LogLevel level)
+	bool NanoLogger::is_logged(naiveTrader::LogLevel level)
 	{
 		return static_cast<uint8_t>(level) >= static_cast<uint8_t>(_level);
 	}

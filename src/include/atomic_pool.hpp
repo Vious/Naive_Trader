@@ -13,7 +13,7 @@ class AtomicPool {
 private:
     std::atomic<bool> bLock;
 
-    std::vector<std::shared_ptr<T>> mData;
+    std::vector<T*> mData;
     std::array<std::atomic<bool>, N> mIsUsed;
 
 public:
@@ -21,7 +21,7 @@ public:
         static_assert(std::is_default_constructible<T>::value, "AtomicPool needs a default constructor");
         for (size_t i = 0; i < N; i++) {
             if (i < initSize) {
-                mData.emplace_back(std::make_shared<T>());
+                mData.emplace_back(new T());
             }
             mIsUsed[i].store(false, std::memory_order_release);
         }
@@ -35,12 +35,12 @@ public:
         mData.clear();
     }
 
-    std::shared_ptr<T> resize(bool isUsed) {
+    T* resize(bool isUsed) {
         while(bLock.exchange(true, std::memory_order_acquire));
-        std::shared_ptr<T> ret;
+        T *ret;
         if (mData.size() < N) {
             size_t len = mData.size();
-            mData.emplace_back(std::make_shared<T>());
+            mData.emplace_back(new T());
             mIsUsed[len].store(isUsed, std::memory_order_release);
             ret = mData.back();
         }
@@ -48,8 +48,8 @@ public:
         return ret;
     }
 
-    std::shared_ptr<T> alloc(bool force) {
-        std::shared_ptr<T> ret = nullptr;
+    T* alloc(bool force) {
+        T* ret = nullptr;
         size_t size = mData.size();
         for (size_t i = 0; i < size; i++) {
             auto &isUsed = mIsUsed[i];
@@ -74,7 +74,7 @@ public:
         return ret;
     }
 
-    void recycle(std::shared_ptr<T> data) {
+    void recycle(T *data) {
         size_t size = mData.size();
         for (size_t i = 0; i < size; i++) {
             if (mData[i] == data) {

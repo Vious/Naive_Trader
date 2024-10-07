@@ -16,13 +16,13 @@ namespace mpsc
     // queue node
     template <typename T>
     struct Node {
-        std::shared_ptr<T> value;
+        T* value;
 
         // next node in the queue
-        std::atomic<std::shared_ptr<Node<T>>> next;
+        std::atomic<Node<T>*> next;
 
-        Node(std::shared_ptr<T> val) : value(val) {
-            this->next.exchange(std::atomic<std::shared_ptr<Node<T>>>(nullptr));
+        Node(T* val) : value(val) {
+            this->next.exchange(std::atomic<Node<T>*>(nullptr));
         }
 
         // move constructor
@@ -36,16 +36,16 @@ namespace mpsc
     template <typename T>
     struct MPSCQueue {
         // head of the queue, atomic pointer
-        std::atomic<std::shared_ptr<Node<T>>> head;
+        std::atomic<Node<T>*> head;
 
         // queue tail pointer
-        std::shared_ptr<Node<T>> tail;
+        Node<T>* tail;
 
         // initialize the queue
         MPSCQueue() {
-            auto nodePtr = std::make_shared<Node<T>>(nullptr);
-            this->head.exchange(std::atomic<std::shared_ptr<Node<T>>>(nodePtr));
-            this->tail = nodePtr;
+            auto stub = new Node<T>(nullptr);
+            this->head.exchange(std::atomic<Node<T>*>(stub));
+            this->tail = stub;
         }
 
         // move constructor
@@ -72,15 +72,15 @@ namespace mpsc
         }
 
         // push function
-        void push(std::shared_ptr<T> val) {
-            auto aNode = std::make_shared<Node<T>>(val);
+        void push(T* val) {
+            auto aNode = new Node<T>(val);
             auto prev = this->head.exchange(aNode, std::memory_order_acq_rel);
             prev->next.store(aNode, std::memory_order_release);
         }
 
         // pop a node
-        std::shared_ptr<T> pop() {
-            std::shared_ptr<T> ret = nullptr;
+        T* pop() {
+            T* ret = nullptr;
             auto tail = this->tail;
             auto next = tail->next.load(std::memory_order_acquire);
             if (next != nullptr) {
