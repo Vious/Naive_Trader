@@ -8,7 +8,6 @@
 namespace naiveTrader
 {
  
-using Str2StrMap = std::map<std::string, std::string>;
 
 class Params {
 private:

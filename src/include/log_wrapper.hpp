@@ -137,17 +137,17 @@ public:
 } // namespace naiveTrader
 
 #ifndef NDEBUG
-#define LOG_TRACE(...) if(is_ready())LogLine(LogLevel::LOGLV_TRACE,__FILE__,__func__,__LINE__).print(__VA_ARGS__);
-#define LOG_DEBUG(...) if(is_ready())LogLine(LogLevel::LOGLV_DEBUG,__FILE__,__func__,__LINE__).print(__VA_ARGS__);
+#define LOG_TRACE(...) if(isReady())LogLine(LogLevel::LOGLV_TRACE,__FILE__,__func__,__LINE__).print(__VA_ARGS__);
+#define LOG_DEBUG(...) if(isReady())LogLine(LogLevel::LOGLV_DEBUG,__FILE__,__func__,__LINE__).print(__VA_ARGS__);
 #define PROFILE_DEBUG(msg) //log_profile(LogLevel::LOGLV_DEBUG,__FILE__,__func__,__LINE__,msg);
 #else
 #define LOG_TRACE(...) 
 #define LOG_DEBUG(...) 
 #define PROFILE_DEBUG(msg) 
 #endif
-#define LOG_INFO(...) if(is_ready())LogLine(LogLevel::LOGLV_INFO,__FILE__,__func__,__LINE__).print(__VA_ARGS__);
-#define LOG_WARNING(...) if(is_ready())LogLine(LogLevel::LOGLV_WARNING,__FILE__,__func__,__LINE__).print(__VA_ARGS__);
-#define LOG_ERROR(...) if(is_ready())LogLine(LogLevel::LOGLV_ERROR,__FILE__,__func__,__LINE__).print(__VA_ARGS__);
-#define LOG_FATAL(...) if(is_ready())LogLine(LogLevel::LOGLV_FATAL,__FILE__,__func__,__LINE__).print(__VA_ARGS__);
+#define LOG_INFO(...) if(isReady())LogLine(LogLevel::LOGLV_INFO,__FILE__,__func__,__LINE__).print(__VA_ARGS__);
+#define LOG_WARNING(...) if(isReady())LogLine(LogLevel::LOGLV_WARNING,__FILE__,__func__,__LINE__).print(__VA_ARGS__);
+#define LOG_ERROR(...) if(isReady())LogLine(LogLevel::LOGLV_ERROR,__FILE__,__func__,__LINE__).print(__VA_ARGS__);
+#define LOG_FATAL(...) if(isReady())LogLine(LogLevel::LOGLV_FATAL,__FILE__,__func__,__LINE__).print(__VA_ARGS__);
 
 #define PROFILE_INFO(msg) //log_profile(LLV_INFO,__FILE__,__func__,__LINE__,msg);

@@ -40,15 +40,15 @@ public:
     virtual ~ActualMarket() {}
 
 protected:
-    ActualMarket(const std::shared_ptr<std::unordered_map<std::string, std::string>> &aExcgIdMap) : excgIdMap(aExcgIdMap) {}
+    ActualMarket(const std::shared_ptr<Str2StrMap> &aExcgIdMap) : excgIdMap(aExcgIdMap) {}
 
-    std::shared_ptr<std::unordered_map<std::string, std::string>> excgIdMap;
+    std::shared_ptr<Str2StrMap> excgIdMap;
 
 };
 
 class SyncActualMarket : public ActualMarket, public DirectEvent<MarketEventType> {
 protected:
-    SyncActualMarket(const std::shared_ptr<std::unordered_map<std::string, std::string>> &aExcgIdMap) : ActualMarket(aExcgIdMap) {}
+    SyncActualMarket(const std::shared_ptr<Str2StrMap> &aExcgIdMap) : ActualMarket(aExcgIdMap) {}
 
     virtual void bindEvent(MarketEventType type, std::function<void(const std::vector<std::any>&)> handler) override {
         this->addHandler(type, handler);
@@ -62,7 +62,7 @@ protected:
 
 class AsyncActualMarket : public ActualMarket, public EventSource<MarketEventType, 1024> {
 protected:
-    AsyncActualMarket(const std::shared_ptr<std::unordered_map<std::string, std::string>> &aExcgIdMap) : ActualMarket(aExcgIdMap) {}
+    AsyncActualMarket(const std::shared_ptr<Str2StrMap> &aExcgIdMap) : ActualMarket(aExcgIdMap) {}
 
     virtual void update() override {
         this->process();

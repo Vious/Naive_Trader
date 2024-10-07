@@ -28,7 +28,7 @@
 
 namespace naiveTrader
 {
-
+using Str2StrMap = std::map<std::string, std::string>;
 typedef uint64_t estid_t;
 
 constexpr estid_t INVALID_ESTID = 0x0LLU;
