@@ -58,12 +58,12 @@ inline std::string toString(const std::vector<T> &values) {
 }
 
 template<typename T>
-static std::string extractToString(const T& value) {
+inline std::string extractToString(const T& value) {
     return toString(value);
 }
 
 template<typename A, typename... Types>
-static void extractToString(std::vector<std::string>& data, const A& firstArg, const Types&... args) {
+inline void extractToString(std::vector<std::string>& data, const A& firstArg, const Types&... args) {
     data.emplace_back(toString(firstArg));
     extractToString(data, args...);
 }
@@ -115,6 +115,24 @@ inline std::string format(const std::string& s, const T &... values) {
             index = (index * 10) + n;
             ++index_length;
         }
+    }
+
+    return result;
+}
+
+template<typename T>
+inline bool contains(const std::vector<T>& values, const T value) {
+    return std::find(values.begin(), values.end(), value) != values.end();
+}
+
+template<typename... T>
+inline std::string join(const std::string& separator, const std::vector<T> &... values) {
+    std::vector<std::string> args;
+    extractToString(args, values...);
+    std::string result;
+    for (const auto& s : args) {
+        result.append(s);
+        result.append(separator);
     }
 
     return result;
