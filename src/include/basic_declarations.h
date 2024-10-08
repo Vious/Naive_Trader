@@ -36,7 +36,7 @@ constexpr estid_t INVALID_ESTID = 0x0LLU;
 
 enum class OrderType;
 
-enum class PositionOffsetType;
+enum class PosOffsetType;
 
 enum class DirectionType;
 
