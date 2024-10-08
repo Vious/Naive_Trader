@@ -3,7 +3,7 @@
 #include <mutex>
 #include <condition_variable>
 
-#include "../../api/CTP_V6.6.9_20220920/ThostFtdcMdApi.h"
+#include "../../../api/CTP_V6.6.9_20220920/ThostFtdcMdApi.h"
 #include "../../include/basic_declarations.h"
 #include "../../include/market_api.h"
 #include "../../include/event_helper.hpp"
@@ -91,8 +91,12 @@ private:
     std::unique_lock<std::mutex> processMutex;
     std::condition_variable processSignal;
 
-    bool isInit;
+    bool m_isInited;
 
+    typedef CThostFtdcMdApi* (*marketCreator)(const char*, const bool, const bool);
+    
+    marketCreator m_ctpCreator;
+    DLLHandler m_marketHandler;
 };
 
     
