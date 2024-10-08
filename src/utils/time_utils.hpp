@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-
+#include "../include/define.hpp"
 // seconds
 #define DAY_SECONDS 86400
 #define MINUTE_SECONDS 60
@@ -54,11 +54,47 @@ inline time_t makeTime(uint32_t utime) {
     return hour * HOUR_SECONDS + min * MINUTE_SECONDS + sec;
 }
 
-// inline time_t makeTime(const char *ctime) {
-//     int timeValue[3] = {0};
-//     char tmp[3] = {'\0'};
+inline time_t makeTime(const char *ctime) {
+	int time_value[3] = { 0 };
+	char tmp[3] = { '\0' };
+	size_t i = 0;
+	size_t q = 0;
+	size_t p = 0;
+	while (ctime[p] != '\0') {
+		if (ctime[p] == ':') {
+			tmp[p - q] = '\0';
+			time_value[i++] = atoi(tmp);
+			q = p + 1;
+		}
+		else {
+			tmp[p - q] = ctime[p];
+		}
+		p++;
+	}
+	tmp[p - q] = '\0';
+	time_value[i++] = atoi(tmp);
+	return time_value[0] * HOUR_SECONDS + time_value[1] * MINUTE_SECONDS + time_value[2];
+}
 
-// }
+inline dayTime_t daytmSequence(dayTime_t tm) {
+    // offset 16 hours
+    if (tm < 16 * HOUR_MILLISECONDS) {
+        return tm + DAY_MILLISECONDS - 16 * HOUR_MILLISECONDS;
+    } else {
+        return tm - 16 * HOUR_MILLISECONDS;
+    }
+}
+
+/// @brief 
+/// @param time 
+/// @param tick 
+/// @return 
+inline dayTime_t makeDayTm(const char* time, uint32_t tick) {
+    if (time != nullptr) {
+        return daytmSequence(static_cast<dayTime_t>(makeTime(time)) * SECOND_MILLISECONDS + tick);
+    }
+    return -1;
+}
 
 } // namespace TimeUtils
 
