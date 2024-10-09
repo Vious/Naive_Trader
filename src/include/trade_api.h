@@ -8,7 +8,7 @@ namespace naiveTrader
 
 enum class TraderEventType : uint8_t {
     TET_Invalid,
-    TET_CancelOrder,
+    TET_OrderCancel,
     TET_OrderPlace,
     TET_OrderDeal,
     TET_OrderTrade,

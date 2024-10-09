@@ -34,7 +34,7 @@ public:
 
     virtual bool isUsable() const noexcept override;
 
-    virtual estid_t placeOrder(PosOffsetType offset, DirectionType direction, const ExCode &code, uint32_t count, double_t price, OrderType flag) noexcept override;
+    virtual estid_t placeOrder(PosOffsetType offset, DirectionType direction, const ExCode &code, uint32_t volume, double_t price, OrderType flag) noexcept override;
 
     virtual bool cancelOrder(estid_t estid) noexcept override;
 
