@@ -9,12 +9,16 @@ namespace naiveTrader
 {
 
 LightMarketAPI::LightMarketAPI() {
-    char pathBuffer[64] = {0};
-    sprintf(pathBuffer, "%s/market_data/%s/%s/", userconfig::TraderFlow.c_str(), userconfig::BrokerID.c_str(), userconfig::UserID.c_str());
-    if (!std::filesystem::exists(pathBuffer)) {
-        std::filesystem::create_directories(pathBuffer);
+    // char pathBuffer[64] = {0};
+    // sprintf(pathBuffer, "%s/market_data/%s/%s/", userconfig::TraderFlow.c_str(), userconfig::BrokerID.c_str(), userconfig::UserID.c_str());
+    auto currentPath = std::filesystem::current_path();
+    currentPath += userconfig::TraderFlow;
+    // auto flowPath = std::filesystem::create_directories(currentPath);
+
+    if (!std::filesystem::exists(currentPath)) {
+        auto flowPath = std::filesystem::create_directories(currentPath);
     }
-    m_marketApi = CThostFtdcMdApi::CreateFtdcMdApi(pathBuffer);
+    m_marketApi = CThostFtdcMdApi::CreateFtdcMdApi(currentPath.string().c_str());
     m_marketApi->RegisterSpi(this);
     m_marketApi->RegisterFront(const_cast<char*>(userconfig::MarketFrontAddr.c_str()));
     m_marketApi->Init();
