@@ -26,8 +26,8 @@ public:
     }
 
     bool tryPop(T &data) {
-        std::lock_guard<std::mutex> lock(mMutex);
-        if (mQueue.isEmpty()) {
+        std::unique_lock<std::mutex> lock(mMutex);
+        if (mQueue.empty()) {
             return false;
         }
         data = mQueue.front();
@@ -36,8 +36,8 @@ public:
     }
 
     void waitAndPop(T &data) {
-        std::lock_guard<std::mutex> lock(mMutex);
-        while(mQueue.isEmpty()) {
+        std::unique_lock<std::mutex> lock(mMutex);
+        while(mQueue.empty()) {
             mSignal.wait(lock);
         }
         data = mQueue.front();
@@ -45,8 +45,8 @@ public:
     }
 
     bool tryWaitAndPopFor(T &data, uint32_t millis) {
-        std::lock_guard<std::mutex> lock(mMutex);
-        while(mQueue.isEmpty()) {
+        std::unique_lock<std::mutex> lock(mMutex);
+        while(mQueue.empty()) {
             mSignal.wait_for(lock, std::chrono::milliseconds(millis));
             return false;
         }
